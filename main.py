@@ -2,17 +2,26 @@ import cv2
 import numpy
 import random
 
-def liesWithin(y, x, image, width):
+def liesWithin(y, x, image, width, height):
+   # print(x, width, y, height)
    inx=0
-   prev=0
+   iny=0
+   prevx=0
+   prevy=0
    for i in range(x, width):
-      if image[y][i][0]==0 and image[y][prev][0]!=0:
+      if image[y][i][0]==0 and image[y][prevx][0]!=0:
          inx+=1
-      prev=i
-   return inx
+      prevx=i
+   for j in range(y, height):
+      if image[j][x][0]==0 and image[prevy][x][0]!=0:
+         iny+=1
+      prevy=j
+   if inx%2==1 and iny%2==1:
+      return 1
+   return 0
 
-image = cv2.imread("rect.png")
-original=cv2.imread("rect.png")
+image = cv2.imread("circle.png")
+original=cv2.imread("circle.png")
 # kernel = numpy.ones((3,3),numpy.uint8)
 # eroded = cv2.erode(image,kernel,iterations = 1)
 # eroded = cv2.erode(eroded,kernel,iterations = 1)
@@ -57,7 +66,7 @@ count=0
 for r in range(10000):
    x=random.randint(0, width-1)
    y=random.randint(0, height-1)
-   lw=liesWithin(y, x, image, width)
+   lw=liesWithin(y, x, image, width, height)
    if lw%2==1 and image[y][x][0]!=0:
       count_in+=1
       original[y][x] = [0, 0, 255]
@@ -85,11 +94,11 @@ cv2.waitKey(0)
 
 # for x in boundary:
 #    if len(boundary[x])>1:
-#       cv2.rect(img,(x,boundary[x][0]), 1, (0,0,255), -1)
-#       cv2.rect(img,(x,boundary[x][1]), 1, (0,0,255), -1)
+#       cv2.circle(img,(x,boundary[x][0]), 1, (0,0,255), -1)
+#       cv2.circle(img,(x,boundary[x][1]), 1, (0,0,255), -1)
 #    else:
 #       print(x, boundary[x])
-#       cv2.rect(img,(x,boundary[x][0]), 1, (0,0,255), -1)
+#       cv2.circle(img,(x,boundary[x][0]), 1, (0,0,255), -1)
 
 # # cv2.imshow('Draw01',img)
 # # cv2.waitKey(0)
