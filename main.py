@@ -1,6 +1,8 @@
 import cv2
 import numpy
 import random
+import copy 
+
 
 def liesWithin(y, x, image, width, height):
    # print(x, width, y, height)
@@ -20,46 +22,52 @@ def liesWithin(y, x, image, width, height):
       return 1
    return 0
 
-image = cv2.imread("circle.png")
-original=cv2.imread("circle.png")
-# kernel = numpy.ones((3,3),numpy.uint8)
-# eroded = cv2.erode(image,kernel,iterations = 1)
-# eroded = cv2.erode(eroded,kernel,iterations = 1)
+def thinning(image, height, width):
+   out=[]
+   for it in range(3):
+      redundant=[[0 for i in range(width)] for j in range(height)]
+      for j in range(1, height-1):
+         for i in range(1, width-1):
+            kernel=[]
+            kernel.append(image[j][i-1]);
+            kernel.append(image[j+1][i-1]);
+            kernel.append(image[j+1][i]);
+            kernel.append(image[j+1][i+1]);
+            kernel.append(image[j][i+1]);
+            kernel.append(image[j-1][i+1]);
+            kernel.append(image[j-1][i]);
+            kernel.append(image[j-1][i-1]);
+            kernel.append(image[j][i-1]);
+            sp=0
+            np=0
+            for k in range(8):
+               if not numpy.array_equal(kernel[k+1], kernel[k]):
+                  sp+=1
+               if kernel[k].all()==0:
+                  np+=1
 
-# cv2.imshow('Main', image)
-# cv2.imshow('Numpy Vertical', eroded)
-# cv2.waitKey(0)
+            if np in [0, 1, 7, 8] or sp<2:
+               redundant[j][i]=1
+
+      for j in range(1, height-1):
+         for i in range(1, width-1):
+            if redundant[j][i]!=1:
+               image[j][i]=[255, 255, 255]
+
+      out.append(copy.deepcopy(image))
+   return out
+
+
+image = cv2.imread("circle_t.png")
+original=cv2.imread("circle_t.png")
+
 
 height, width, channels = image.shape
-redundant=[[0 for i in range(width)] for j in range(height)]
-# for it in range(1):
-#    for j in range(1, height-1):
-#       for i in range(1, width-1):
-#          kernel=[]
-#          kernel.append(image[j][i-1]);
-#          kernel.append(image[j+1][i-1]);
-#          kernel.append(image[j+1][i]);
-#          kernel.append(image[j+1][i+1]);
-#          kernel.append(image[j][i+1]);
-#          kernel.append(image[j-1][i+1]);
-#          kernel.append(image[j-1][i]);
-#          kernel.append(image[j-1][i-1]);
-#          kernel.append(image[j][i-1]);
-#          sp=0
-#          np=0
-#          for k in range(8):
-#             if not numpy.array_equal(kernel[k+1], kernel[k]):
-#                sp+=1
-#             if kernel[k].all()==0:
-#                np+=1
+out=thinning(image, height, width)
 
-#          if np in [0, 1, 7, 8] or sp<2:
-#             redundant[j][i]=1
-
-#    for j in range(1, height-1):
-#       for i in range(1, width-1):
-#          if redundant[j][i]!=1:
-#             image[j][i]=[255, 255, 255]
+for o in range(len(out)):
+   cv2.imshow(str(o), out[o])
+cv2.waitKey(0)
 
 count_in=0
 count=0
@@ -81,33 +89,7 @@ outer_area=width*height
 inner_area=ratio*outer_area
 print(inner_area, outer_area, ratio)
 
-cv2.imshow('original', original)
-cv2.imshow('thinned', image)
+cv2.imshow("plot", original)
 cv2.waitKey(0)
 
 
-# print(boundary)
-# boundary = smooth(boundary)
-# print(boundary)
-
-# img = numpy.zeros((height,width,3), numpy.uint8)
-
-# for x in boundary:
-#    if len(boundary[x])>1:
-#       cv2.circle(img,(x,boundary[x][0]), 1, (0,0,255), -1)
-#       cv2.circle(img,(x,boundary[x][1]), 1, (0,0,255), -1)
-#    else:
-#       print(x, boundary[x])
-#       cv2.circle(img,(x,boundary[x][0]), 1, (0,0,255), -1)
-
-# # cv2.imshow('Draw01',img)
-# # cv2.waitKey(0)
-
-# count=0
-
-# for i in range(10000):
-#    y = random.random() * height
-#    x = random.random() * width
-#    count+=liesWithin(boundary, x, y)
-
-# print(count)
