@@ -3,6 +3,7 @@ import numpy
 import random
 import copy 
 
+strEle = [[[0,0,0] for i in range(5)] for j in range(5)]
 
 def liesWithin(y, x, image, width, height):
    # print(x, width, y, height)
@@ -57,13 +58,33 @@ def thinning(image, height, width):
       out.append(copy.deepcopy(image))
    return out
 
+def strthinning(image, height, width):
+   print(image[0][0])
+   out=[]
+   f=1
+   for j in range(2, height-2):
+      for i in range(2, width-2):
+         for p in range(-2, 3):
+            for q in range(-2, 3):
+               if strEle[p+2][q+2][0] != image[j+p][i+q][0]:
+                  f=0
+                  break
+               else:
+                  image[j+p][i+q] = [255,255,255]
+            if f==0:
+               break
+         if f==1:
+            image[j][i] = [0,0,0]
+   out.append(copy.deepcopy(image))
+   return out
+
 
 image = cv2.imread("circle_t.png")
 original=cv2.imread("circle_t.png")
 
 
 height, width, channels = image.shape
-out=thinning(image, height, width)
+out=strthinning(image, height, width)
 
 for o in range(len(out)):
    cv2.imshow(str(o), out[o])
@@ -91,5 +112,3 @@ print(inner_area, outer_area, ratio)
 
 cv2.imshow("plot", original)
 cv2.waitKey(0)
-
-
