@@ -59,23 +59,18 @@ def thinning(image, height, width):
    return out
 
 def strthinning(image, height, width):
-   print(image[0][0])
-   out=[]
-   f=1
+   out = copy.deepcopy(image)
    for j in range(2, height-2):
       for i in range(2, width-2):
+         f=1
          for p in range(-2, 3):
             for q in range(-2, 3):
-               if strEle[p+2][q+2][0] != image[j+p][i+q][0]:
+               if image[j+p][i+q][0] != 0:
                   f=0
-                  break
-               else:
-                  image[j+p][i+q] = [255,255,255]
-            if f==0:
-               break
          if f==1:
-            image[j][i] = [0,0,0]
-   out.append(copy.deepcopy(image))
+            out[j][i] = [0, 0, 0]
+         else:
+            out[j][i] = [255, 255, 255]
    return out
 
 
@@ -86,8 +81,7 @@ original=cv2.imread("circle_t.png")
 height, width, channels = image.shape
 out=strthinning(image, height, width)
 
-for o in range(len(out)):
-   cv2.imshow(str(o), out[o])
+cv2.imshow("out", out)
 cv2.waitKey(0)
 
 count_in=0
